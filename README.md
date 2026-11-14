@@ -8,6 +8,8 @@ A professional, zero-dependency fractal rendering engine designed for students, 
 
 **Live Demo:** [amurlaniakea.github.io/fractal](https://amurlaniakea.github.io/fractal)
 
+![Fractal Engine Demo](fractal-demo.jpg)
+
 ## 🧠 Architecture
 - **Async Core:** Calculations run in a dedicated Web Worker to ensure 60 FPS UI responsiveness.
 - **Secure Custom Equations:** Students can define $z_{n+1} = f(z_n, c)$ using a safe sandbox (`mul(z,z) + c`) without risking code injection.
