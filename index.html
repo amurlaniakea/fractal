@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mandelbrot Core | amurlaniakea</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #000; color: #fff; font-family: monospace; }
+    canvas { display: block; width: 100vw; height: 100vh; }
+    #controls { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 4px; }
+    label { display: block; margin-top: 8px; font-size: 14px; }
+    input { width: 100%; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <label>Max Iterations: <span id="iterVal">100</span></label>
+    <input type="range" id="maxIter" min="50" max="1000" value="100">
+    <label>Zoom: <span id="zoomVal">1.0</span></label>
+    <input type="range" id="zoom" min="1" max="5000" value="1" step="10">
+  </div>
+  <canvas id="fractalCanvas"></canvas>
+  <script src="fractals.js"></script>
+</body>
+</html>
