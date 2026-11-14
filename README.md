@@ -1,6 +1,10 @@
+<!-- SPDX-FileCopyrightText: 2026 Pedro Sordo Martínez <amurlaniakea@gmail.com> -->
+<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 # Fractal / Núcleo Matemático
 
 > *"Tecnósfera al servicio de la Biósfera."* — *La Paz Es El Camino.*
+
+![Fractal Demo](./fractal-demo.jpg)
 
 A professional, zero-dependency fractal rendering engine designed for students, educators, and mathematicians. Features non-blocking Web Worker architecture, secure mathematical parser for custom equations, and bilingual support (ES/EN).
 
@@ -24,4 +28,5 @@ Motor profesional de renderizado de fractales de **cero dependencias**, diseñad
 </details>
 
 ## ⚖️ License
-AGPL-3.0-or-later. © 2026 Pedro Sordo Martínez (@amurlaniakea).
+
+[AGPL-3.0-or-later](LICENSE). © 2026 Pedro Sordo Martínez <amurlaniakea@gmail.com>.

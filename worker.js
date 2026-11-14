@@ -1,5 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Pedro Sordo Martínez <amurlaniakea@gmail.com>
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Mandelbrot Core - Worker Thread (Zero Dependencies)
-// License: AGPL-3.0-or-later | Author: Pedro Sordo Martínez (@amurlaniakea)
 const C = {
   add: (a, b) => ({ r: a.r + b.r, i: a.i + b.i }),
   sub: (a, b) => ({ r: a.r - b.r, i: a.i - b.i }),

@@ -1,5 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Pedro Sordo Martínez <amurlaniakea@gmail.com>
+// SPDX-License-Identifier: AGPL-3.0-or-later
 // Mandelbrot Core - UI & I18N (Zero Dependencies)
-// License: AGPL-3.0-or-later | Author: Pedro Sordo Martínez (@amurlaniakea)
 const I18N={
   es:{title:"Motor de Fractales | Núcleo Matemático",type:"Tipo de Fractal",mandelbrot:"Mandelbrot",julia:"Conjunto de Julia",burning:"Burning Ship",custom:"Ecuación Propia",iter:"Iteraciones",zoom:"Nivel de Zoom",palette:"Paleta",eq:"Ecuación z = f(z, c)",eq_help:"Usa: add(z,c), mul(z,z), pow(z,2), sin(z), exp(z)",source:"Código Fuente (AGPL-3.0)",lang:"English",render:"Renderizar"},
   en:{title:"Fractal Engine | Mathematical Core",type:"Fractal Type",mandelbrot:"Mandelbrot",julia:"Julia Set",burning:"Burning Ship",custom:"Custom Equation",iter:"Iterations",zoom:"Zoom Level",palette:"Palette",eq:"Equation z = f(z, c)",eq_help:"Use: add(z,c), mul(z,z), pow(z,2), sin(z), exp(z)",source:"Source Code (AGPL-3.0)",lang:"Español",render:"Render"}
