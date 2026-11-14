@@ -1,23 +1,27 @@
-# Mandelbrot Core
+# Fractal / Núcleo Matemático
 
 > *"Tecnósfera al servicio de la Biósfera."* — *La Paz Es El Camino.*
 
-A zero-dependency, mathematically rigorous fractal rendering engine. It computes the Mandelbrot set using pure JavaScript and HTML5 Canvas, featuring smooth coloring algorithms and explicit Float64 precision limits. No external libraries, no CDNs, no build steps.
+A professional, zero-dependency fractal rendering engine designed for students, educators, and mathematicians. Features non-blocking Web Worker architecture, secure mathematical parser for custom equations, and bilingual support (ES/EN).
 
-**Live Demo:** [amurlaniakea.github.io/mandelbrot-core](https://amurlaniakea.github.io/mandelbrot-core)
+**Live Demo:** [amurlaniakea.github.io/fractal](https://amurlaniakea.github.io/fractal)
 
-## Mathematical Foundation
-The engine iterates the complex function \( z_{n+1} = z_n^2 + c \). Escape is determined when \( |z| > 2 \). Smooth coloring is applied using the normalized iteration count formula:
-\[ \mu = n + 1 - \log_2(\log_2(|z|)) \]
-This eliminates color banding and provides continuous gradients for verifiable visual analysis.
+## 🧠 Architecture
+- **Async Core:** Calculations run in a dedicated Web Worker to ensure 60 FPS UI responsiveness.
+- **Secure Custom Equations:** Students can define $z_{n+1} = f(z_n, c)$ using a safe sandbox (`mul(z,z) + c`) without risking code injection.
+- **Float64 Precision:** Explicit limits documented in the source code.
 
-## Usage
-1. Clone or download this repository.
-2. Open `index.html` directly in any modern web browser.
-3. Use the on-screen controls to adjust `maxIterations` and `zoom`.
+## 📚 Supported Fractals
+1. **Mandelbrot Set:** The classic $z^2 + c$.
+2. **Julia Set:** Interactive exploration with fixed $c$.
+3. **Burning Ship:** Absolute value variant.
+4. **Custom Engine:** Write your own iterative complex functions.
 
 <details>
 <summary><strong>Resumen en Español</strong></summary>
 
-Motor de renderizado de fractales de **cero dependencias** y rigor matemático. Calcula el conjunto de Mandelbrot usando JavaScript puro y HTML5 Canvas, con algoritmos de coloración suave y límites explícitos de precisión Float64. Sin librerías externas, sin CDNs, sin procesos de compilación. Licencia: AGPL-3.0-or-later.
+Motor profesional de renderizado de fractales de **cero dependencias**, diseñado para estudiantes, profesores y matemáticos. Utiliza una arquitectura de *Web Workers* para no bloquear la interfaz, un parser matemático seguro para que los alumnos creen sus propias ecuaciones iterativas, y soporte bilingüe nativo.
 </details>
+
+## ⚖️ License
+AGPL-3.0-or-later. © 2026 Pedro Sordo Martínez (@amurlaniakea).
