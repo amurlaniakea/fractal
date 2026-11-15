@@ -12,7 +12,7 @@ A professional, zero-dependency fractal rendering engine designed for students, 
 
 ## 🧠 Architecture
 - **Async Core:** Calculations run in a dedicated Web Worker to ensure 60 FPS UI responsiveness.
-^- **Custom Equations:** disabled pending a safe AST parser. The previous dynamic-evaluation path was removed to avoid code injection.
+- **Custom Equations:** disabled pending a safe AST parser. The previous dynamic-evaluation path was removed to avoid code injection.
 - **Float64 Precision:** Explicit limits documented in the source code.
 
 ## 📚 Supported Fractals
