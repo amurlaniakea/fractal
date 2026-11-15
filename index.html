@@ -1,66 +1,45 @@
 <!DOCTYPE html>
-<!-- SPDX-FileCopyrightText: 2026 Pedro Sordo Martínez <amurlaniakea@gmail.com> -->
-<!-- SPDX-License-Identifier: AGPL-3.0-or-later -->
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title data-key="title">Motor de Fractales | Núcleo Matemático</title>
+  <title>Motor de Fractales</title>
   <style>
-    body{margin:0;background:#0a0a0a;color:#eee;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden;}
-    canvas{display:block;width:100vw;height:100vh;cursor:crosshair;}
-    #ui{position:fixed;top:20px;left:20px;width:280px;background:rgba(10,10,15,0.85);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
-    #langBtn{width:100%;margin-bottom:12px;padding:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:#fff;font-size:12px;cursor:pointer;}
-    #langBtn:hover{background:rgba(255,255,255,0.2);}
-    h2{margin:0 0 12px;font-weight:300;letter-spacing:1px;color:#0ff;font-size:16px;}
-    label{display:block;margin:8px 0 4px;font-size:11px;opacity:0.8;}
-    select,input[type=text]{width:100%;padding:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:#fff;font-size:12px;box-sizing:border-box;}
-    option{background:#0a0a0a;color:#eee;}
-    input[type=range]{width:100%;margin:2px 0;}
-    .val{float:right;color:#0ff;}
-    #customBox{display:none;margin-top:8px;padding:8px;background:rgba(0,255,255,0.05);border-radius:6px;}
-    #customBox small{display:block;margin-top:2px;opacity:0.6;font-family:monospace;font-size:10px;}
-    #renderBtn{width:100%;margin-top:12px;padding:8px;background:linear-gradient(135deg,#0ff,#08f);border:none;border-radius:6px;color:#000;font-weight:bold;cursor:pointer;}
-    #renderBtn:hover{opacity:0.9;}
-    a{color:#0ff;text-decoration:none;font-size:11px;display:block;margin-top:12px;text-align:center;opacity:0.7;}
-    a:hover{opacity:1;}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { display: flex; height: 100vh; background: #0a0a0a; color: #eee; font-family: sans-serif; }
+    #panel { width: 300px; background: rgba(20,20,30,0.95); padding: 20px; overflow-y: auto; }
+    #canvas-container { flex: 1; background: #000; }
+    canvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
+    button, select, input { width: 100%; padding: 8px; margin: 8px 0; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #fff; }
+    label { display: block; margin: 10px 0 4px; font-size: 12px; }
+    h2 { color: #0ff; margin-bottom: 16px; }
   </style>
 </head>
 <body>
-  <canvas id="fractalCanvas"></canvas>
-  <div id="ui">
-    <button id="langBtn" data-key="lang">English</button>
-    <h2 data-key="title">Motor de Fractales</h2>
-    <label data-key="type">Tipo de Fractal</label>
+  <div id="panel">
+    <button id="langBtn">English</button>
+    <h2>Motor de Fractales</h2>
+    <label>Tipo de Fractal</label>
     <select id="fractalType">
-      <option value="mandelbrot" data-key="mandelbrot">Mandelbrot</option>
-      <option value="julia" data-key="julia">Julia</option>
-      <option value="burningship" data-key="burning">Burning Ship</option>
-      <option value="tricorn" data-key="tricorn">Tricorn</option>
-      <option value="celtic" data-key="celtic">Celtic</option>
-      <option value="buffalo" data-key="buffalo">Buffalo</option>
-      <option value="custom" data-key="custom">Ecuación Propia</option>
+      <option value="mandelbrot">Mandelbrot</option>
+      <option value="julia">Julia</option>
+      <option value="burningship">Burning Ship</option>
+      <option value="tricorn">Tricorn</option>
+      <option value="celtic">Celtic</option>
+      <option value="buffalo">Buffalo</option>
     </select>
-    <div id="customBox">
-      <label data-key="eq">Ecuación z = f(z, c)</label>
-      <input type="text" id="customExpr" value="mul(z,z)+c">
-      <small data-key="eq_help">Usa: add(z,c), mul(z,z), pow(z,2), sin(z)</small>
-    </div>
-    <label data-key="iter">Iteraciones <span class="val" id="iterVal">100</span></label>
+    <label>Iteraciones: <span id="iterVal">100</span></label>
     <input type="range" id="maxIter" min="50" max="2000" value="100">
-    <label data-key="zoom">Nivel de Zoom <span class="val" id="zoomVal">1</span></label>
+    <label>Zoom: <span id="zoomVal">1</span></label>
     <input type="range" id="zoom" min="1" max="1000" value="1">
-    <label data-key="palette">Paleta</label>
+    <label>Paleta</label>
     <select id="palette">
       <option value="fuego">Fuego</option>
       <option value="hielo">Hielo</option>
       <option value="neon">Neón</option>
-      <option value="oceano">Océano</option>
-      <option value="bosque">Bosque</option>
-      <option value="academico">Académico</option>
     </select>
-    <button id="renderBtn" data-key="render">Renderizar</button>
-    <a href="https://github.com/amurlaniakea/fractal" target="_blank" data-key="source">Código Fuente (AGPL-3.0)</a>
+  </div>
+  <div id="canvas-container">
+    <canvas id="fractalCanvas"></canvas>
   </div>
   <script src="fractals.js"></script>
 </body>
