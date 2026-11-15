@@ -12,14 +12,14 @@ A professional, zero-dependency fractal rendering engine designed for students, 
 
 ## 🧠 Architecture
 - **Async Core:** Calculations run in a dedicated Web Worker to ensure 60 FPS UI responsiveness.
-- **Custom Equations: disabled pending a safe AST parser. The previous dynamic-evaluation path was removed to avoid code injection.
+^- **Custom Equations:** disabled pending a safe AST parser. The previous dynamic-evaluation path was removed to avoid code injection.
 - **Float64 Precision:** Explicit limits documented in the source code.
 
 ## 📚 Supported Fractals
 1. **Mandelbrot Set:** The classic $z^2 + c$.
 2. **Julia Set:** Interactive exploration with fixed $c$.
 3. **Burning Ship:** Absolute value variant.
-4. **Custom Engine:** Write your own iterative complex functions.
+4. **Custom Engine:** disabled pending a safe AST parser.
 
 <details>
 <summary><strong>Resumen en Español</strong></summary>
