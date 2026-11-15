@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 const I18N = {
-  es: { title: "Motor de Fractales", type: "Tipo de Fractal", mandelbrot: "Mandelbrot", julia: "Julia", burning: "Burning Ship", tricorn: "Tricorn", celtic: "Celtic", buffalo: "Buffalo", iter: "Iteraciones", zoom: "Nivel de Zoom", palette: "Paleta", lang: "English", render: "Renderizar" },
-  en: { title: "Fractal Engine", type: "Fractal Type", mandelbrot: "Mandelbrot", julia: "Julia", burning: "Burning Ship", tricorn: "Tricorn", celtic: "Celtic", buffalo: "Buffalo", iter: "Iterations", zoom: "Zoom Level", palette: "Palette", lang: "Español", render: "Render" }
+  es: { title: "Motor de Fractales", type: "Tipo de Fractal", mandelbrot: "Mandelbrot", julia: "Julia", burning: "Burning Ship", tricorn: "Tricorn", celtic: "Celtic", buffalo: "Buffalo", multibrot3: "Multibrot z^3", multibrot4: "Multibrot z^4", phoenix: "Phoenix", iter: "Iteraciones", zoom: "Nivel de Zoom", palette: "Paleta", lang: "English", render: "Renderizar" },
+  en: { title: "Fractal Engine", type: "Fractal Type", mandelbrot: "Mandelbrot", julia: "Julia", burning: "Burning Ship", tricorn: "Tricorn", celtic: "Celtic", buffalo: "Buffalo", multibrot3: "Multibrot z^3", multibrot4: "Multibrot z^4", phoenix: "Phoenix", iter: "Iterations", zoom: "Zoom Level", palette: "Palette", lang: "Español", render: "Render" }
 };
 
 let currentLang = 'es';
@@ -198,3 +198,65 @@ render();
   };
 })();
 window.addEventListener('load', () => { resizeCanvas(); render(); });
+
+// Fix: vistas por defecto según tipo de fractal
+(function () {
+  const DEFAULT_VIEWS = {
+    mandelbrot: { centerX: -0.743643887037151, centerY: 0.13182590420533, zoom: 1, maxIter: 300 },
+    julia: { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 },
+    burningship: { centerX: -0.5, centerY: -0.5, zoom: 1, maxIter: 300 },
+    tricorn: { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 },
+    celtic: { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 },
+    buffalo: { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 },
+    multibrot3: { centerX: 0, centerY: 0, zoom: 1.5, maxIter: 350 },
+    multibrot4: { centerX: 0, centerY: 0, zoom: 1.5, maxIter: 350 },
+    phoenix: { centerX: 0, centerY: 0, zoom: 1, maxIter: 500 }
+  };
+
+  function syncControls() {
+    const zoomSlider = document.getElementById('zoom');
+    const zoomVal = document.getElementById('zoomVal');
+    const iterSlider = document.getElementById('maxIter');
+    const iterVal = document.getElementById('iterVal');
+
+    if (zoomSlider) {
+      zoomSlider.value = Math.max(1, Math.min(100, Math.round(state.zoom)));
+    }
+
+    if (zoomVal) {
+      zoomVal.textContent = zoomSlider ? zoomSlider.value : Math.round(state.zoom);
+    }
+
+    if (iterSlider) {
+      iterSlider.value = state.maxIter;
+    }
+
+    if (iterVal) {
+      iterVal.textContent = state.maxIter;
+    }
+  }
+
+  window.resetViewForType = function (type) {
+    const v = DEFAULT_VIEWS[type] || { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 };
+
+    state.centerX = v.centerX;
+    state.centerY = v.centerY;
+    state.zoom = v.zoom;
+    state.maxIter = v.maxIter;
+
+    syncControls();
+  };
+
+  const typeSelect = document.getElementById('fractalType');
+
+  if (typeSelect) {
+    typeSelect.onchange = function (e) {
+      state.type = e.target.value;
+      resetViewForType(state.type);
+      render();
+    };
+  }
+
+  // Aplicar vista correcta desde la primera carga
+  resetViewForType(state.type);
+})();
