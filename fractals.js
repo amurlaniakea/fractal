@@ -8,22 +8,23 @@ let currentLang = 'es';
 const worker = new Worker('worker.js');
 const canvas = document.getElementById('fractalCanvas');
 const ctx = canvas.getContext('2d', { alpha: false });
+const container = document.getElementById('canvas-container');
 const state = { centerX: -0.5, centerY: 0, zoom: 1, maxIter: 100, type: 'mandelbrot', palette: 'fuego' };
 
 function translate() {
   const t = I18N[currentLang];
   document.title = t.title;
-  document.querySelectorAll('option, label, h2, button').forEach(el => {
-    const key = el.getAttribute('data-key') || el.textContent.toLowerCase(); // Simplificado para el HTML nuevo
+  document.querySelectorAll('[data-key]').forEach(el => {
+    const k = el.getAttribute('data-key');
+    if (t[k]) el.textContent = t[k];
   });
   document.getElementById('langBtn').textContent = t.lang;
 }
 
 function render() {
-  const container = document.getElementById('canvas-container');
   const w = container.clientWidth;
   const h = container.clientHeight;
-  if (w === 0 || h === 0) return; // Evitar renderizado si el contenedor no tiene tamaño
+  if (w === 0 || h === 0) return;
   
   canvas.width = w;
   canvas.height = h;
@@ -32,8 +33,7 @@ function render() {
   const range = 3.0 / state.zoom;
   
   worker.postMessage({
-    width: w,
-    height: h,
+    width: w, height: h,
     minX: state.centerX - range / 2,
     maxX: state.centerX + range / 2,
     minY: state.centerY - (range / aspect) / 2,
@@ -50,30 +50,20 @@ worker.onmessage = (e) => {
   ctx.putImageData(img, 0, 0);
 };
 
+// SOLUCIÓN DEFINITIVA: ResizeObserver detecta cambios reales en el cuadro, no en la ventana
+const resizeObserver = new ResizeObserver(() => {
+  requestAnimationFrame(render);
+});
+resizeObserver.observe(container);
+
 document.getElementById('langBtn').onclick = () => {
   currentLang = currentLang === 'es' ? 'en' : 'es';
   translate();
 };
-
-document.getElementById('fractalType').onchange = (e) => {
-  state.type = e.target.value;
-  render();
-};
-
-document.getElementById('palette').onchange = (e) => {
-  state.palette = e.target.value;
-  render();
-};
-
-document.getElementById('maxIter').oninput = (e) => {
-  state.maxIter = parseInt(e.target.value);
-  document.getElementById('iterVal').textContent = e.target.value;
-};
-
-document.getElementById('zoom').oninput = (e) => {
-  state.zoom = parseFloat(e.target.value);
-  document.getElementById('zoomVal').textContent = e.target.value;
-};
+document.getElementById('fractalType').onchange = (e) => { state.type = e.target.value; render(); };
+document.getElementById('palette').onchange = (e) => { state.palette = e.target.value; render(); };
+document.getElementById('maxIter').oninput = (e) => { state.maxIter = parseInt(e.target.value); document.getElementById('iterVal').textContent = e.target.value; };
+document.getElementById('zoom').oninput = (e) => { state.zoom = parseFloat(e.target.value); document.getElementById('zoomVal').textContent = e.target.value; };
 
 canvas.onclick = (e) => {
   const rect = canvas.getBoundingClientRect();
@@ -87,11 +77,6 @@ canvas.onclick = (e) => {
   document.getElementById('zoomVal').textContent = Math.min(1000, state.zoom);
   render();
 };
-
-window.addEventListener('resize', () => {
-  // Pequeño delay para asegurar que el layout CSS ya se actualizó
-  setTimeout(render, 100);
-});
 
 translate();
 render();
