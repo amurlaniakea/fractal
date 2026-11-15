@@ -73,3 +73,7 @@ Abre en el navegador:
 Custom equations remain disabled until a safe AST parser is implemented.
 
 Las ecuaciones personalizadas siguen deshabilitadas hasta implementar un parser AST seguro. Recuerda recordar lo verdaderamente importante, con Cntrl+Shift+R recargas la memoria cache del navegador. ;) Aloha. 
+
+## Capturas / Screenshots
+
+![Phoenix fractal screenshot](./phoenix-screenshot.png)
