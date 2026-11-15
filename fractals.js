@@ -13,7 +13,7 @@ const ctx = canvas.getContext('2d', { alpha: false });
 const container = document.getElementById('canvas-container');
 
 // Estado inicial seguro y acotado
-const state = { centerX: -0.5, centerY: 0, zoom: 1, maxIter: 100, type: 'mandelbrot', palette: 'fuego' };
+const state = { centerX: -0.743643887037151, centerY: 0.13182590420533, zoom: 1, maxIter: 300, type: "mandelbrot", palette: "fuego" };
 
 let currentWidth = 0;
 let currentHeight = 0;
@@ -61,7 +61,7 @@ function render() {
       maxX: state.centerX + range / 2,
       minY: state.centerY - (range / aspect) / 2,
       maxY: state.centerY + (range / aspect) / 2,
-      maxIter: state.maxIter,
+      maxIter: Math.min(2000, Math.max(state.maxIter, Math.floor(100 + 120 * Math.log2(Math.max(1, state.zoom))))),
       type: state.type,
       palette: state.palette,
       juliaC: state.type === 'julia' ? { r: -0.8, i: 0.156 } : null
@@ -125,3 +125,22 @@ translate();
 resizeCanvas();
 updateZoomUI(); // Asegura que el slider y el estado coincidan al cargar
 render();
+
+// Fix: zoom seguro (clamp + debounce)
+(()=>{
+  const slider = document.getElementById("zoom");
+  const label = document.getElementById("zoomVal");
+  let timer = null;
+  const clamp = (z) => Math.max(1, Math.min(100, Number(z) || 1));
+  const sync = () => {
+    slider.value = clamp(state.zoom);
+    label.textContent = slider.value;
+  };
+  slider.oninput = (e) => {
+    state.zoom = clamp(e.target.value);
+    sync();
+    clearTimeout(timer);
+    timer = setTimeout(render, 120);
+  };
+  sync();
+})();
