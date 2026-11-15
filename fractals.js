@@ -71,6 +71,11 @@ function render() {
 }
 
 worker.onmessage = (e) => {
+  const expected = canvas.width * canvas.height * 4;
+  if (!e.data || !e.data.data || e.data.data.byteLength !== expected) {
+    console.warn("Frame descartado: byteLength", e.data && e.data.data ? e.data.data.byteLength : "null", "esperado", expected);
+    return;
+  }
   const img = new ImageData(new Uint8ClampedArray(e.data.data), canvas.width, canvas.height);
   ctx.putImageData(img, 0, 0);
 };
@@ -147,29 +152,6 @@ render();
   sync();
 })();
 
-// Fix: límite duro de zoom para interfaz táctil.
-// Evita saltos bruscos a zonas sin detalle o interiores negros.
-(function () {
-  const MIN_ZOOM = 1;
-  const MAX_ZOOM = 100;
-
-  let zoomValue = Number(state.zoom) || MIN_ZOOM;
-  zoomValue = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoomValue));
-
-  Object.defineProperty(state, 'zoom', {
-    configurable: true,
-    enumerable: true,
-    get() {
-      return zoomValue;
-    },
-    set(value) {
-      const n = Number(value);
-      zoomValue = Number.isFinite(n)
-        ? Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, n))
-        : MIN_ZOOM;
-    }
-  });
-})();
 
 // Fix: descarta respuestas antiguas del worker.
 // Si llega un fotograma viejo, se ignora visualmente.
@@ -453,4 +435,29 @@ try {
       render();
     };
   }
+})();
+
+// Fix: anti-cola del worker
+(function () {
+  let busy = false;
+  let pending = false;
+  const origPost = worker.postMessage.bind(worker);
+  worker.postMessage = function (msg) {
+    busy = true;
+    try { return origPost(msg); } catch (e) { busy = false; throw e; }
+  };
+  const origMsg = worker.onmessage;
+  worker.onmessage = function (ev) {
+    try { if (typeof origMsg === "function") origMsg.call(this, ev); }
+    finally { busy = false; if (pending) { pending = false; render(); } }
+  };
+  worker.onerror = function (ev) {
+    busy = false; pending = false;
+    console.error("Worker error:", ev && ev.message ? ev.message : ev);
+  };
+  const origRender = render;
+  render = function () {
+    if (busy) { pending = true; return; }
+    origRender();
+  };
 })();
