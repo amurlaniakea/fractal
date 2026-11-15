@@ -26,6 +26,10 @@ function iterate(zr,zi,cr,ci,maxIter,type,juliaC){
     if(type==='mandelbrot') z={r:z.r*z.r-z.i*z.i+c.r, i:2*z.r*z.i+c.i};
     else if(type==='julia') z={r:z.r*z.r-z.i*z.i+c.r, i:2*z.r*z.i+c.i};
     else if(type==='burningship') z={r:z.r*z.r-z.i*z.i+c.r, i:Math.abs(2*z.r*z.i)+c.i};
+    else if(type==='julia') z={r:z.r*z.r-z.i*z.i+c.r, i:2*z.r*z.i+c.i};
+    else if(type==='tricorn') z={r:z.r*z.r-z.i*z.i+c.r, i:-2*z.r*z.i+c.i};
+    else if(type==='celtic') z={r:Math.abs(z.r*z.r-z.i*z.i)+c.r, i:2*z.r*z.i+c.i};
+    else if(type==='buffalo') z={r:Math.abs(z.r*z.r-z.i*z.i)+c.r, i:Math.abs(2*z.r*z.i)+c.i};
     else if(type==='tricorn') z={r:z.r*z.r-z.i*z.i+c.r, i:-2*z.r*z.i+c.i};
     else if(type==='celtic') z={r:Math.abs(z.r*z.r-z.i*z.i)+c.r, i:2*z.r*z.i+c.i};
     else if(type==='buffalo') z={r:Math.abs(z.r*z.r-z.i*z.i)+c.r, i:Math.abs(2*z.r*z.i)+c.i};
