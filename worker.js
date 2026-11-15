@@ -62,5 +62,5 @@ self.onmessage=(e)=>{
       data[idx]=r; data[idx+1]=g; data[idx+2]=b; data[idx+3]=255;
     }
   }
-  self.postMessage({data:data.buffer},[data.buffer]);
+  self.postMessage({data:data.buffer,width,height});
 };

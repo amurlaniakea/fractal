@@ -22,7 +22,9 @@ function render(){
   worker.postMessage(msg);
 }
 worker.onmessage=(e)=>{
-  const img=new ImageData(new Uint8ClampedArray(e.data.data),canvas.width,canvas.height);
+  const {data,width,height}=e.data;
+  if(width!==canvas.width || height!==canvas.height) return; // respuesta obsoleta
+  const img=new ImageData(new Uint8ClampedArray(data),width,height);
   ctx.putImageData(img,0,0);
 };
 document.getElementById('langBtn').onclick=(e)=>{e.stopPropagation();currentLang=currentLang==='es'?'en':'es';translate();};
