@@ -15,7 +15,7 @@ function translate(){
 }
 function render(){
   const rect=canvas.getBoundingClientRect(), w=rect.width, h=rect.height;
-  canvas.width=w; canvas.height=h;
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight; canvas.style.width = "100vw"; canvas.style.height = "100vh";
   const aspect=w/h, range=3.0/state.zoom;
   const msg={width:w,height:h,minX:state.centerX-range/2,maxX:state.centerX+range/2,minY:state.centerY-(range/aspect)/2,maxY:state.centerY+(range/aspect)/2,...state};
   if(state.type==='julia') msg.juliaC={r:-0.8,i:0.156};
