@@ -81,3 +81,6 @@ canvas.onclick = (e) => {
 
 translate();
 render();
+document.getElementById('renderBtn').onclick = () => render();
+document.getElementById('maxIter').onchange = () => render();
+document.getElementById('zoom').onchange = () => render();
