@@ -16,8 +16,8 @@ let customFn = null;
 function compileCustom(expr) {
   try {
     if (/\b(window|document|eval|Function|fetch|import|require|process)\b/.test(expr)) throw new Error("Blocked");
-    customFn = new Function('z','c','C',`const add=C.add,sub=C.sub,mul=C.mul,div=C.div,pow=C.pow,exp=C.exp,sin=C.sin,cos=C.cos,mag=C.mag;return ${expr.replace(/\^/g,'**')};`);
-    return true;
+    customFn = null; // SECURITY: dynamic evaluation disabled
+    return false;
   } catch(e){ return false; }
 }
 function iterate(zr,zi,cr,ci,maxIter,type,juliaC){
@@ -54,7 +54,7 @@ self.onmessage=(e)=>{
   const data=new Uint8ClampedArray(width*height*4);
   for(let y=0;y<height;y++){
     for(let x=0;x<width;x++){
-      const cr=minX+(x/width)*(maxX-minX), ci=minY+(y/height)*(maxY-minY);
+      const cr=minX+(x/width)*(maxX-minX), ci=maxY-(y/height)*(maxY-minY);
       const zr=(type==='julia')?cr:0, zi=(type==='julia')?ci:0;
       const val=iterate(zr,zi,cr,ci,maxIter,type,juliaC);
       const [r,g,b]=getColor(val,maxIter,palette);
@@ -62,5 +62,5 @@ self.onmessage=(e)=>{
       data[idx]=r; data[idx+1]=g; data[idx+2]=b; data[idx+3]=255;
     }
   }
-  self.postMessage({data:data.buffer,width,height});
+  self.postMessage({data:data.buffer,width,height,__rid:e.data.__rid},[data.buffer]);
 };

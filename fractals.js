@@ -197,3 +197,4 @@ render();
     }
   };
 })();
+window.addEventListener('load', () => { resizeCanvas(); render(); });
