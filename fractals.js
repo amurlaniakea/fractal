@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Mandelbrot Core - UI & I18N (Zero Dependencies)
 const I18N={
-  es:{title:"Motor de Fractales | Núcleo Matemático",type:"Tipo de Fractal",mandelbrot:"Mandelbrot",julia:"Conjunto de Julia",burning:"Burning Ship",custom:"Ecuación Propia",iter:"Iteraciones",zoom:"Nivel de Zoom",palette:"Paleta",eq:"Ecuación z = f(z, c)",eq_help:"Usa: add(z,c), mul(z,z), pow(z,2), sin(z), exp(z)",source:"Código Fuente (AGPL-3.0)",lang:"English",render:"Renderizar"},
-  en:{title:"Fractal Engine | Mathematical Core",type:"Fractal Type",mandelbrot:"Mandelbrot",julia:"Julia Set",burning:"Burning Ship",custom:"Custom Equation",iter:"Iterations",zoom:"Zoom Level",palette:"Palette",eq:"Equation z = f(z, c)",eq_help:"Use: add(z,c), mul(z,z), pow(z,2), sin(z), exp(z)",source:"Source Code (AGPL-3.0)",lang:"Español",render:"Render"}
+  es:{title:"Motor de Fractales | Núcleo Matemático",type:"Tipo de Fractal",mandelbrot:"Mandelbrot",julia:"Julia",burning:"Burning Ship",tricorn:"Tricorn",celtic:"Celtic",buffalo:"Buffalo",custom:"Ecuación Propia",iter:"Iteraciones",zoom:"Nivel de Zoom",palette:"Paleta",eq:"Ecuación z = f(z, c)",eq_help:"Usa: add(z,c), mul(z,z), pow(z,2), sin(z), exp(z)",source:"Código Fuente (AGPL-3.0)",lang:"English",render:"Renderizar"},
+  en:{title:"Fractal Engine | Mathematical Core",type:"Fractal Type",mandelbrot:"Mandelbrot",julia:"Julia Set",burning:"Burning Ship",tricorn:"Tricorn",celtic:"Celtic",buffalo:"Buffalo",custom:"Custom Equation",iter:"Iterations",zoom:"Zoom Level",palette:"Palette",eq:"Equation z = f(z, c)",eq_help:"Use: add(z,c), mul(z,z), pow(z,2), sin(z), exp(z)",source:"Source Code (AGPL-3.0)",lang:"Español",render:"Render"}
 };
 let currentLang='es';
 const worker=new Worker('worker.js'), canvas=document.getElementById('fractalCanvas'), ctx=canvas.getContext('2d',{alpha:false});
@@ -25,7 +25,7 @@ worker.onmessage=(e)=>{
   const img=new ImageData(new Uint8ClampedArray(e.data.data),canvas.width,canvas.height);
   ctx.putImageData(img,0,0);
 };
-document.getElementById('langBtn').onclick=()=>{currentLang=currentLang==='es'?'en':'es';translate();};
+document.getElementById('langBtn').onclick=(e)=>{e.stopPropagation();currentLang=currentLang==='es'?'en':'es';translate();};
 document.getElementById('fractalType').onchange=(e)=>{state.type=e.target.value;document.getElementById('customBox').style.display=state.type==='custom'?'block':'none';render();};
 document.getElementById('palette').onchange=(e)=>{state.palette=e.target.value;render();};
 document.getElementById('maxIter').oninput=(e)=>{state.maxIter=+e.target.value;document.getElementById('iterVal').textContent=e.target.value;};

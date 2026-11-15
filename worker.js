@@ -24,7 +24,11 @@ function iterate(zr,zi,cr,ci,maxIter,type,juliaC){
   let z={r:zr,i:zi}, c=(type==='julia')?juliaC:{r:cr,i:ci}, iter=0;
   while(z.r*z.r+z.i*z.i<=4 && iter<maxIter){
     if(type==='mandelbrot') z={r:z.r*z.r-z.i*z.i+c.r, i:2*z.r*z.i+c.i};
+    else if(type==='julia') z={r:z.r*z.r-z.i*z.i+c.r, i:2*z.r*z.i+c.i};
     else if(type==='burningship') z={r:z.r*z.r-z.i*z.i+c.r, i:Math.abs(2*z.r*z.i)+c.i};
+    else if(type==='tricorn') z={r:z.r*z.r-z.i*z.i+c.r, i:-2*z.r*z.i+c.i};
+    else if(type==='celtic') z={r:Math.abs(z.r*z.r-z.i*z.i)+c.r, i:2*z.r*z.i+c.i};
+    else if(type==='buffalo') z={r:Math.abs(z.r*z.r-z.i*z.i)+c.r, i:Math.abs(2*z.r*z.i)+c.i};
     else if(type==='custom' && customFn){ try{z=customFn(z,c,C);}catch(e){break;} }
     iter++;
   }
@@ -38,6 +42,8 @@ function getColor(val,maxIter,palette){
     fuego:(t)=>[Math.min(255,255*t*3),Math.min(255,255*Math.max(0,t*3-1)),Math.min(255,255*Math.max(0,t*3-2))],
     hielo:(t)=>[Math.sin(t*5)*127+128,Math.sin(t*5+2)*127+128,255],
     neon:(t)=>[Math.sin(t*10)*255,Math.sin(t*10+2)*255,Math.sin(t*10+4)*255],
+    oceano:(t)=>[0,Math.min(255,100+155*t),Math.min(255,200+55*t)],
+    bosque:(t)=>[Math.min(255,100*t),Math.min(255,150+105*t),Math.min(255,50*t)],
     academico:(t)=>[Math.sin(t*3.14)*255,100,255-Math.sin(t*3.14)*255]
   };
   return p[palette](t).map(v=>Math.max(0,Math.min(255,v)));

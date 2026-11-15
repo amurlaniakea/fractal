@@ -9,31 +9,35 @@
   <style>
     body{margin:0;background:#0a0a0a;color:#eee;font-family:'Segoe UI',system-ui,sans-serif;overflow:hidden;}
     canvas{display:block;width:100vw;height:100vh;cursor:crosshair;}
-    #ui{position:fixed;top:20px;left:20px;width:320px;background:rgba(20,20,30,0.85);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,0.5);}
-    h2{margin:0 0 20px;font-weight:300;letter-spacing:1px;color:#0ff;}
-    label{display:block;margin:12px 0 6px;font-size:13px;opacity:0.8;}
-    select,input[type=text],button{width:100%;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;font-size:14px;box-sizing:border-box;}
-    input[type=range]{width:100%;}
+    #ui{position:fixed;top:20px;left:20px;width:280px;background:rgba(10,10,15,0.85);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,0.5);}
+    #langBtn{width:100%;margin-bottom:12px;padding:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:#fff;font-size:12px;cursor:pointer;}
+    #langBtn:hover{background:rgba(255,255,255,0.2);}
+    h2{margin:0 0 12px;font-weight:300;letter-spacing:1px;color:#0ff;font-size:16px;}
+    label{display:block;margin:8px 0 4px;font-size:11px;opacity:0.8;}
+    select,input[type=text]{width:100%;padding:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.2);border-radius:6px;color:#fff;font-size:12px;box-sizing:border-box;}
+    input[type=range]{width:100%;margin:2px 0;}
     .val{float:right;color:#0ff;}
-    #customBox{display:none;margin-top:10px;padding:10px;background:rgba(0,255,255,0.05);border-radius:8px;}
-    #customBox small{display:block;margin-top:4px;opacity:0.6;font-family:monospace;}
-    button{margin-top:20px;background:linear-gradient(135deg,#0ff,#08f);border:none;font-weight:bold;cursor:pointer;transition:transform 0.2s;}
-    button:hover{transform:translateY(-2px);}
-    #langBtn{position:fixed;top:20px;right:20px;width:auto;padding:8px 16px;font-size:12px;background:rgba(20,20,30,0.85);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#fff;cursor:pointer;}
-    a{color:#0ff;text-decoration:none;font-size:12px;display:block;margin-top:20px;text-align:center;opacity:0.7;}
+    #customBox{display:none;margin-top:8px;padding:8px;background:rgba(0,255,255,0.05);border-radius:6px;}
+    #customBox small{display:block;margin-top:2px;opacity:0.6;font-family:monospace;font-size:10px;}
+    #renderBtn{width:100%;margin-top:12px;padding:8px;background:linear-gradient(135deg,#0ff,#08f);border:none;border-radius:6px;color:#000;font-weight:bold;cursor:pointer;}
+    #renderBtn:hover{opacity:0.9;}
+    a{color:#0ff;text-decoration:none;font-size:11px;display:block;margin-top:12px;text-align:center;opacity:0.7;}
     a:hover{opacity:1;}
   </style>
 </head>
 <body>
   <canvas id="fractalCanvas"></canvas>
-  <button id="langBtn">English</button>
   <div id="ui">
+    <button id="langBtn" data-key="lang">English</button>
     <h2 data-key="title">Motor de Fractales</h2>
     <label data-key="type">Tipo de Fractal</label>
     <select id="fractalType">
       <option value="mandelbrot" data-key="mandelbrot">Mandelbrot</option>
-      <option value="julia" data-key="julia">Conjunto de Julia</option>
+      <option value="julia" data-key="julia">Julia</option>
       <option value="burningship" data-key="burning">Burning Ship</option>
+      <option value="tricorn" data-key="tricorn">Tricorn</option>
+      <option value="celtic" data-key="celtic">Celtic</option>
+      <option value="buffalo" data-key="buffalo">Buffalo</option>
       <option value="custom" data-key="custom">Ecuación Propia</option>
     </select>
     <div id="customBox">
@@ -47,10 +51,12 @@
     <input type="range" id="zoom" min="1" max="1000" value="1">
     <label data-key="palette">Paleta</label>
     <select id="palette">
-      <option value="fuego">Fuego (Académico)</option>
-      <option value="hielo">Hielo (Científico)</option>
-      <option value="neon">Neón (Artístico)</option>
-      <option value="academico">Monocromo (Papel)</option>
+      <option value="fuego">Fuego</option>
+      <option value="hielo">Hielo</option>
+      <option value="neon">Neón</option>
+      <option value="oceano">Océano</option>
+      <option value="bosque">Bosque</option>
+      <option value="academico">Académico</option>
     </select>
     <button id="renderBtn" data-key="render">Renderizar</button>
     <a href="https://github.com/amurlaniakea/fractal" target="_blank" data-key="source">Código Fuente (AGPL-3.0)</a>
