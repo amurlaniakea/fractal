@@ -144,3 +144,56 @@ render();
   };
   sync();
 })();
+
+// Fix: límite duro de zoom para interfaz táctil.
+// Evita saltos bruscos a zonas sin detalle o interiores negros.
+(function () {
+  const MIN_ZOOM = 1;
+  const MAX_ZOOM = 100;
+
+  let zoomValue = Number(state.zoom) || MIN_ZOOM;
+  zoomValue = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoomValue));
+
+  Object.defineProperty(state, 'zoom', {
+    configurable: true,
+    enumerable: true,
+    get() {
+      return zoomValue;
+    },
+    set(value) {
+      const n = Number(value);
+      zoomValue = Number.isFinite(n)
+        ? Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, n))
+        : MIN_ZOOM;
+    }
+  });
+})();
+
+// Fix: descarta respuestas antiguas del worker.
+// Si llega un fotograma viejo, se ignora visualmente.
+(function () {
+  let latestRid = 0;
+
+  const originalPostMessage = worker.postMessage.bind(worker);
+
+  worker.postMessage = function (message) {
+    message = message || {};
+    message.__rid = ++latestRid;
+    return originalPostMessage(message);
+  };
+
+  const originalOnMessage = worker.onmessage;
+
+  worker.onmessage = function (event) {
+    const rid = event && event.data && event.data.__rid;
+
+    // Si el worker ya devuelve id, ignoramos fotogramas obsoletos.
+    if (typeof rid === 'number' && rid !== latestRid) {
+      return;
+    }
+
+    if (typeof originalOnMessage === 'function') {
+      return originalOnMessage.call(this, event);
+    }
+  };
+})();
