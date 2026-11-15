@@ -63,8 +63,9 @@ document.getElementById('langBtn').onclick = () => {
 document.getElementById('fractalType').onchange = (e) => { state.type = e.target.value; render(); };
 document.getElementById('palette').onchange = (e) => { state.palette = e.target.value; render(); };
 document.getElementById('maxIter').oninput = (e) => { state.maxIter = parseInt(e.target.value); document.getElementById('iterVal').textContent = e.target.value; };
-document.getElementById('zoom').oninput = (e) => { state.zoom = parseFloat(e.target.value); document.getElementById('zoomVal').textContent = e.target.value; };
-
+let zoomTimeout;
+document.getElementById('zoom').oninput = (e) => { state.zoom = parseFloat(e.target.value); document.getElementById('zoomVal').textContent = e.target.value; clearTimeout(zoomTimeout); zoomTimeout = setTimeout(render, 150); };
+document.getElementById('renderBtn').onclick = () => render();
 canvas.onclick = (e) => {
   const rect = canvas.getBoundingClientRect();
   const x = (e.clientX - rect.left) / rect.width;
