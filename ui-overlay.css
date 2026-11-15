@@ -131,3 +131,24 @@ body {
     min-height: 240px;
   }
 }
+
+/* Fix layout: evita que el area de render colapse a pocos pixeles */
+html, body {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+}
+
+#canvas-container {
+  height: 100%;
+  min-height: 240px;
+}
+
+@media (max-width: 860px) {
+  #canvas-container {
+    height: 58vh;
+    min-height: 240px;
+  }
+}
