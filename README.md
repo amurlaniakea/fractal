@@ -6,13 +6,13 @@
 
 ![Fractal Demo](./fractal-demo.jpg)
 
-A professional, zero-dependency fractal rendering engine designed for students, educators, and mathematicians. Features non-blocking Web Worker architecture, secure mathematical parser for custom equations, and bilingual support (ES/EN).
+A professional, zero-dependency fractal rendering engine designed for students, educators, and mathematicians. Features non-blocking Web Worker architecture, custom equations disabled until a safe AST parser is implemented, and bilingual support (ES/EN).
 
 **Live Demo:** [amurlaniakea.github.io/fractal](https://amurlaniakea.github.io/fractal)
 
 ## 🧠 Architecture
 - **Async Core:** Calculations run in a dedicated Web Worker to ensure 60 FPS UI responsiveness.
-- **Secure Custom Equations:** Students can define $z_{n+1} = f(z_n, c)$ using a safe sandbox (`mul(z,z) + c`) without risking code injection.
+- **Custom Equations: disabled pending a safe AST parser. The previous dynamic-evaluation path was removed to avoid code injection.
 - **Float64 Precision:** Explicit limits documented in the source code.
 
 ## 📚 Supported Fractals
@@ -24,9 +24,15 @@ A professional, zero-dependency fractal rendering engine designed for students, 
 <details>
 <summary><strong>Resumen en Español</strong></summary>
 
-Motor profesional de renderizado de fractales de **cero dependencias**, diseñado para estudiantes, profesores y matemáticos. Utiliza una arquitectura de *Web Workers* para no bloquear la interfaz, un parser matemático seguro para que los alumnos creen sus propias ecuaciones iterativas, y soporte bilingüe nativo.
+Motor profesional de renderizado de fractales de **cero dependencias**, diseñado para estudiantes, profesores y matemáticos. Utiliza una arquitectura de *Web Workers* para no bloquear la interfaz, las ecuaciones personalizadas están deshabilitadas de forma segura hasta implementar un parser AST, y soporte bilingüe nativo.
 </details>
 
 ## ⚖️ License
 
 [AGPL-3.0-or-later](LICENSE). © 2026 Pedro Sordo Martínez <amurlaniakea@gmail.com>.
+
+## Security note / Nota de seguridad
+
+Custom equations are currently disabled in the worker. The previous implementation used dynamic evaluation (`new Function`) and was removed because it is not a true sandbox. A safe AST parser must be implemented before re-enabling this feature.
+
+Las ecuaciones personalizadas están deshabilitadas en el worker. La implementación anterior usaba evaluación dinámica (`new Function`) y se retiró porque no es un sandbox real. Debe implementarse un parser AST seguro antes de volver a activar esta función.
