@@ -198,3 +198,18 @@ render();
   };
 })();
 window.addEventListener('load', () => { resizeCanvas(); render(); });
+
+(function () {
+  const el = document.getElementById('size-debug');
+  if (!el) return;
+
+  const update = () => {
+    el.textContent =
+      'canvas ' + canvas.width + 'x' + canvas.height +
+      ' | caja ' + container.clientWidth + 'x' + container.clientHeight +
+      ' | zoom ' + Math.round(state.zoom);
+  };
+
+  update();
+  setInterval(update, 500);
+})();
