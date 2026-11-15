@@ -21,7 +21,7 @@ function compileCustom(expr) {
   } catch(e){ return false; }
 }
 function iterate(zr,zi,cr,ci,maxIter,type,juliaC){
-  let z={r:zr,i:zi}, c=(type==='julia')?juliaC:{r:cr,i:ci}, iter=0;
+  let z={r:zr,i:zi}, c=(type==='julia')?juliaC:{r:cr,i:ci}, iter=0, prev={r:0,i:0};
   while(z.r*z.r+z.i*z.i<=4 && iter<maxIter){
     if(type==='mandelbrot') z={r:z.r*z.r-z.i*z.i+c.r, i:2*z.r*z.i+c.i};
     else if(type==='julia') z={r:z.r*z.r-z.i*z.i+c.r, i:2*z.r*z.i+c.i};
@@ -29,6 +29,13 @@ function iterate(zr,zi,cr,ci,maxIter,type,juliaC){
     else if(type==='tricorn') z={r:z.r*z.r-z.i*z.i+c.r, i:-2*z.r*z.i+c.i};
     else if(type==='celtic') z={r:Math.abs(z.r*z.r-z.i*z.i)+c.r, i:2*z.r*z.i+c.i};
     else if(type==='buffalo') z={r:Math.abs(z.r*z.r-z.i*z.i)+c.r, i:Math.abs(2*z.r*z.i)+c.i};
+    else if(type==='multibrot3') z=C.add(C.pow(z,3), c);
+    else if(type==='multibrot4') z=C.add(C.pow(z,4), c);
+    else if(type==='phoenix') {
+      const next = C.add(C.add(C.mul(z, z), c), C.mul({r:0.5,i:0}, prev));
+      prev = z;
+      z = next;
+    }
     else if(type==='custom' && customFn){ try{z=customFn(z,c,C);}catch(e){break;} }
     iter++;
   }
