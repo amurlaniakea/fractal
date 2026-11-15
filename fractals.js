@@ -16,6 +16,7 @@ const state = { centerX: -0.5, centerY: 0, zoom: 1, maxIter: 100, type: 'mandelb
 let currentWidth = 0;
 let currentHeight = 0;
 let renderPending = false;
+let renderTimeout = null;
 
 function translate() {
   const t = I1xN[currentLang];
@@ -79,39 +80,55 @@ document.getElementById('langBtn').onclick = () => {
   currentLang = currentLang === 'es' ? 'en' : 'es';
   translate();
 };
+
 document.getElementById('fractalType').onchange = (e) => { state.type = e.target.value; render(); };
 document.getElementById('palette').onchange = (e) => { state.palette = e.target.value; render(); };
-document.getElementById('maxIter').oninput = (e) => { state.maxIter = parseInt(e.target.value); document.getElementById('iterVal').textContent = e.target.value; };
-document.getElementById('maxIter').onchange = () => render();
-document.getElementById('zoom').oninput = (e) => { state.zoom = parseFloat(e.target.value); document.getElementById('zoomVal').textContent = e.target.value; };
-document.getElementById('zoom').onchange = () => render();
-document.getElementById('renderBtn').onclick = () => render();
 
-// ZOOM CON RUEDA CENTRADO EN EL PUNTERO
-canvas.addEventListener('wheel', (e) => {
-  e.preventDefault();
-  const rect = canvas.getBoundingClientRect();
-  const mouseX = e.clientX - rect.left;
-  const mouseY = e.clientY - rect.top;
-  
-  const aspect = currentWidth / currentHeight;
-  const range = 3.0 / state.zoom;
-  
-  const worldX = (state.centerX - range / 2) + (mouseX / currentWidth) * range;
-  const worldY = (state.centerY - (range / aspect) / 2) + (mouseY / currentHeight) * (range / aspect);
-  
-  const zoomFactor = e.deltaY < 0 ? 1.2 : 1 / 1.2;
-  state.zoom = Math.max(1, Math.min(10000, state.zoom * zoomFactor));
-  
-  const newRange = 3.0 / state.zoom;
-  state.centerX = worldX - (mouseX / currentWidth) * newRange + newRange / 2;
-  state.centerY = worldY - (mouseY / currentHeight) * (newRange / aspect) + (newRange / aspect) / 2;
-  
-  document.getElementById('zoom').value = state.zoom;
-  document.getElementById('zoomVal').textContent = Math.round(state.zoom);
-  
-  render();
+document.getElementById('maxIter').oninput = (e) => { 
+  state.maxIter = parseInt(e.target.value); 
+  document.getElementById('iterVal').textContent = e.target.value; 
+};
+document.getElementById('maxIter').onchange = () => render();
+
+const zoomSlider = document.getElementById('zoom');
+const zoomVal = document.getElementById('zoomVal');
+
+function updateZoomUI() {
+  const displayZoom = Math.min(1000, Math.round(state.zoom));
+  zoomSlider.value = displayZoom;
+  zoomVal.textContent = displayZoom;
+}
+
+zoomSlider.oninput = (e) => {
+  state.zoom = parseFloat(e.target.value);
+  updateZoomUI();
+  clearTimeout(renderTimeout);
+  renderTimeout = setTimeout(render, 150);
+};
+
+let touchStartDist = 0;
+let touchStartZoom = 1;
+
+canvas.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    touchStartDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    touchStartZoom = state.zoom;
+  }
 }, { passive: false });
+
+canvas.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    const dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    state.zoom = Math.max(1, Math.min(10000, touchStartZoom * (dist / touchStartDist)));
+    updateZoomUI();
+    clearTimeout(renderTimeout);
+    renderTimeout = setTimeout(render, 50);
+  }
+}, { passive: false });
+
+document.getElementById('renderBtn').onclick = () => render();
 
 translate();
 resizeCanvas();
