@@ -16,10 +16,16 @@ A professional, zero-dependency fractal rendering engine designed for students, 
 - **Float64 Precision:** Explicit limits documented in the source code.
 
 ## 📚 Supported Fractals
-1. **Mandelbrot Set:** The classic $z^2 + c$.
-2. **Julia Set:** Interactive exploration with fixed $c$.
+1. **Mandelbrot Set:** The classic z^2 + c.
+2. **Julia Set:** Interactive exploration with fixed c.
 3. **Burning Ship:** Absolute value variant.
-4. **Custom Engine:** disabled pending a safe AST parser.
+4. **Tricorn:** Mandelbrot with conjugate z.
+5. **Celtic:** Absolute value on the real component.
+6. **Buffalo:** Absolute value on both components.
+7. **Multibrot z^3:** Higher-order Mandelbrot variant.
+8. **Multibrot z^4:** Higher-order Mandelbrot variant.
+9. **Phoenix:** Two-step recurrence with fixed P=0.5.
+10. **Custom Engine:** disabled pending a safe AST parser.
 
 <details>
 <summary><strong>Resumen en Español</strong></summary>
