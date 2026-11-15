@@ -107,13 +107,15 @@
       <option value="buffalo" data-key="buffalo">Buffalo</option>
       <option value="multibrot3" data-key="multibrot3">Multibrot z^3</option>
       <option value="multibrot4" data-key="multibrot4">Multibrot z^4</option>
+      <option value="multibrot5" data-key="multibrot5">Multibrot z^5</option>
+      <option value="multibrot6" data-key="multibrot6">Multibrot z^6</option>
       <option value="phoenix" data-key="phoenix">Phoenix</option>
     </select>
 
-    <label data-key="iter">Iteraciones <span class="val" id="iterVal">100</span></label>
+    <label><span data-key="iter">Iteraciones</span> <span class="val" id="iterVal">100</span></label>
     <input type="range" id="maxIter" min="50" max="2000" value="100">
 
-    <label data-key="zoom">Nivel de Zoom <span class="val" id="zoomVal">1</span></label>
+    <label><span data-key="zoom">Nivel de Zoom</span> <span class="val" id="zoomVal">1</span></label>
     <input type="range" id="zoom" min="1" max="100" step="1" value="1">
 
     <label data-key="palette">Paleta</label>
@@ -125,6 +127,16 @@
       <option value="bosque">Bosque</option>
       <option value="academico">Académico</option>
     </select>
+    <div id="juliaParams" hidden>
+      <label>c.real <span class="val" id="juliaReVal">-0.8</span></label>
+      <input type="number" id="juliaRe" step="0.01" value="-0.8">
+      <label>c.imag <span class="val" id="juliaImVal">0.156</span></label>
+      <input type="number" id="juliaIm" step="0.01" value="0.156">
+    </div>
+    <div id="phoenixParams" hidden>
+      <label>P <span class="val" id="phoenixPVal">0.5</span></label>
+      <input type="number" id="phoenixP" step="0.01" value="0.5">
+    </div>
 
     <button id="renderBtn" data-key="render">Renderizar</button>
     <a href="https://github.com/amurlaniakea/fractal" target="_blank" data-key="source">Código Fuente (AGPL-3.0)</a>

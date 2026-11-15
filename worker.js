@@ -13,6 +13,7 @@ const C = {
   cos: (z) => ({r:Math.cos(z.r)*Math.cosh(z.i), i:-Math.sin(z.r)*Math.sinh(z.i)})
 };
 let customFn = null;
+let phoenixP = 0.5;
 function compileCustom(expr) {
   try {
     if (/\b(window|document|eval|Function|fetch|import|require|process)\b/.test(expr)) throw new Error("Blocked");
@@ -21,7 +22,7 @@ function compileCustom(expr) {
   } catch(e){ return false; }
 }
 function iterate(zr,zi,cr,ci,maxIter,type,juliaC){
-  let z={r:zr,i:zi}, c=(type==='julia')?juliaC:{r:cr,i:ci}, iter=0, prev={r:0,i:0};
+  let z={r:zr,i:zi}, c=(type==='julia'||type==='phoenix')?juliaC:{r:cr,i:ci}, iter=0, prev={r:0,i:0};
   while(z.r*z.r+z.i*z.i<=4 && iter<maxIter){
     if(type==='mandelbrot') z={r:z.r*z.r-z.i*z.i+c.r, i:2*z.r*z.i+c.i};
     else if(type==='julia') z={r:z.r*z.r-z.i*z.i+c.r, i:2*z.r*z.i+c.i};
@@ -31,8 +32,10 @@ function iterate(zr,zi,cr,ci,maxIter,type,juliaC){
     else if(type==='buffalo') z={r:Math.abs(z.r*z.r-z.i*z.i)+c.r, i:Math.abs(2*z.r*z.i)+c.i};
     else if(type==='multibrot3') z=C.add(C.pow(z,3), c);
     else if(type==='multibrot4') z=C.add(C.pow(z,4), c);
+    else if(type==='multibrot5') z=C.add(C.pow(z,5), c);
+    else if(type==='multibrot6') z=C.add(C.pow(z,6), c);
     else if(type==='phoenix') {
-      const next = C.add(C.add(C.mul(z, z), c), C.mul({r:0.5,i:0}, prev));
+      const next = C.add(C.add(C.mul(z, z), c), C.mul({r:phoenixP,i:0}, prev));
       prev = z;
       z = next;
     }
@@ -56,13 +59,14 @@ function getColor(val,maxIter,palette){
   return p[palette](t).map(v=>Math.max(0,Math.min(255,v)));
 }
 self.onmessage=(e)=>{
-  const {width,height,minX,maxX,minY,maxY,maxIter,type,juliaC,palette,customExpr}=e.data;
+  const {width,height,minX,maxX,minY,maxY,maxIter,type,juliaC,palette,customExpr,phoenixP: incomingPhoenixP}=e.data;
+  phoenixP = Number.isFinite(incomingPhoenixP) ? Math.max(-2, Math.min(2, incomingPhoenixP)) : 0.5;
   if(type==='custom' && customExpr) compileCustom(customExpr);
   const data=new Uint8ClampedArray(width*height*4);
   for(let y=0;y<height;y++){
     for(let x=0;x<width;x++){
       const cr=minX+(x/width)*(maxX-minX), ci=maxY-(y/height)*(maxY-minY);
-      const zr=(type==='julia')?cr:0, zi=(type==='julia')?ci:0;
+      const zr=(type==='julia'||type==='phoenix')?cr:0, zi=(type==='julia'||type==='phoenix')?ci:0;
       const val=iterate(zr,zi,cr,ci,maxIter,type,juliaC);
       const [r,g,b]=getColor(val,maxIter,palette);
       const idx=(y*width+x)*4;

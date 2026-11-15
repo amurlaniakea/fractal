@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 const I18N = {
-  es: { title: "Motor de Fractales", type: "Tipo de Fractal", mandelbrot: "Mandelbrot", julia: "Julia", burning: "Burning Ship", tricorn: "Tricorn", celtic: "Celtic", buffalo: "Buffalo", multibrot3: "Multibrot z^3", multibrot4: "Multibrot z^4", phoenix: "Phoenix", iter: "Iteraciones", zoom: "Nivel de Zoom", palette: "Paleta", lang: "English", render: "Renderizar" },
-  en: { title: "Fractal Engine", type: "Fractal Type", mandelbrot: "Mandelbrot", julia: "Julia", burning: "Burning Ship", tricorn: "Tricorn", celtic: "Celtic", buffalo: "Buffalo", multibrot3: "Multibrot z^3", multibrot4: "Multibrot z^4", phoenix: "Phoenix", iter: "Iterations", zoom: "Zoom Level", palette: "Palette", lang: "Español", render: "Render" }
+  es: { title: "Motor de Fractales", type: "Tipo de Fractal", mandelbrot: "Mandelbrot", julia: "Julia", burning: "Burning Ship", tricorn: "Tricorn", celtic: "Celtic", buffalo: "Buffalo", multibrot3: "Multibrot z^3", multibrot4: "Multibrot z^4", phoenix: "Phoenix", multibrot5: "Multibrot z^5", multibrot6: "Multibrot z^6", iter: "Iteraciones", zoom: "Nivel de Zoom", palette: "Paleta", lang: "English", render: "Renderizar" },
+  en: { title: "Fractal Engine", type: "Fractal Type", mandelbrot: "Mandelbrot", julia: "Julia", burning: "Burning Ship", tricorn: "Tricorn", celtic: "Celtic", buffalo: "Buffalo", multibrot3: "Multibrot z^3", multibrot4: "Multibrot z^4", phoenix: "Phoenix", multibrot5: "Multibrot z^5", multibrot6: "Multibrot z^6", iter: "Iterations", zoom: "Zoom Level", palette: "Palette", lang: "Español", render: "Render" }
 };
 
 let currentLang = 'es';
@@ -13,7 +13,7 @@ const ctx = canvas.getContext('2d', { alpha: false });
 const container = document.getElementById('canvas-container');
 
 // Estado inicial seguro y acotado
-const state = { centerX: -0.743643887037151, centerY: 0.13182590420533, zoom: 1, maxIter: 300, type: "mandelbrot", palette: "fuego" };
+const state = { centerX: -0.743643887037151, centerY: 0.13182590420533, zoom: 1, maxIter: 300, type: "mandelbrot", palette: "fuego", juliaRe: -0.8, juliaIm: 0.156, phoenixP: 0.5 };
 
 let currentWidth = 0;
 let currentHeight = 0;
@@ -64,7 +64,8 @@ function render() {
       maxIter: Math.min(2000, Math.max(state.maxIter, Math.floor(100 + 120 * Math.log2(Math.max(1, state.zoom))))),
       type: state.type,
       palette: state.palette,
-      juliaC: state.type === 'julia' ? { r: -0.8, i: 0.156 } : null
+      juliaC: (state.type === 'julia' || state.type === 'phoenix') ? { r: state.juliaRe, i: state.juliaIm } : null,
+    phoenixP: state.type === 'phoenix' ? state.phoenixP : 0.5
     });
   });
 }
@@ -130,11 +131,12 @@ render();
 (()=>{
   const slider = document.getElementById("zoom");
   const label = document.getElementById("zoomVal");
+  if (!slider || !label) return;
   let timer = null;
   const clamp = (z) => Math.max(1, Math.min(100, Number(z) || 1));
   const sync = () => {
     slider.value = clamp(state.zoom);
-    label.textContent = slider.value;
+    if (label) label.textContent = slider.value;
   };
   slider.oninput = (e) => {
     state.zoom = clamp(e.target.value);
@@ -210,7 +212,9 @@ window.addEventListener('load', () => { resizeCanvas(); render(); });
     buffalo: { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 },
     multibrot3: { centerX: 0, centerY: 0, zoom: 2, maxIter: 350 },
     multibrot4: { centerX: 0, centerY: 0, zoom: 2, maxIter: 350 },
-    phoenix: { centerX: 0, centerY: 0, zoom: 1, maxIter: 500 }
+    multibrot5: { centerX: 0, centerY: 0, zoom: 2, maxIter: 300 },
+    multibrot6: { centerX: 0, centerY: 0, zoom: 2, maxIter: 300 },
+    phoenix: { centerX: 0, centerY: 0, zoom: 1, maxIter: 350 }
   };
 
   function syncControls() {
@@ -263,3 +267,190 @@ window.addEventListener('load', () => { resizeCanvas(); render(); });
 
 // Fix: repaint after default view reset
 render();
+// Fix: Julia c and Phoenix P controls
+(function () {
+  const juliaParams = document.getElementById('juliaParams');
+  const phoenixParams = document.getElementById('phoenixParams');
+  const juliaRe = document.getElementById('juliaRe');
+  const juliaIm = document.getElementById('juliaIm');
+  const phoenixP = document.getElementById('phoenixP');
+  const juliaReVal = document.getElementById('juliaReVal');
+  const juliaImVal = document.getElementById('juliaImVal');
+  const phoenixPVal = document.getElementById('phoenixPVal');
+
+  function syncParamLabels() {
+    if (juliaReVal) juliaReVal.textContent = state.juliaRe;
+    if (juliaImVal) juliaImVal.textContent = state.juliaIm;
+    if (phoenixPVal) phoenixPVal.textContent = state.phoenixP;
+  }
+
+  function showParamsForType() {
+    if (juliaParams) juliaParams.hidden = !(state.type === 'julia' || state.type === 'phoenix');
+    if (phoenixParams) phoenixParams.hidden = state.type !== 'phoenix';
+  }
+
+  function bindNumber(input, key) {
+    if (!input) return;
+
+    input.oninput = () => {
+      const v = parseFloat(input.value);
+      if (Number.isFinite(v)) {
+        state[key] = v;
+      }
+      syncParamLabels();
+    };
+
+    input.onchange = () => render();
+  }
+
+  bindNumber(juliaRe, 'juliaRe');
+  bindNumber(juliaIm, 'juliaIm');
+  bindNumber(phoenixP, 'phoenixP');
+
+  const typeSelect = document.getElementById('fractalType');
+
+  if (typeSelect) {
+    const originalOnchange = typeSelect.onchange;
+
+    typeSelect.onchange = function (e) {
+      if (typeof originalOnchange === 'function') {
+        originalOnchange.call(this, e);
+      }
+
+      showParamsForType();
+      syncParamLabels();
+    };
+  }
+
+  if (juliaRe) juliaRe.value = state.juliaRe;
+  if (juliaIm) juliaIm.value = state.juliaIm;
+  if (phoenixP) phoenixP.value = state.phoenixP;
+
+  showParamsForType();
+  syncParamLabels();
+})();
+// Fix: remove zoom accessor hack and install one final zoom handler
+try {
+  const currentZoom = Number(state.zoom) || 1;
+  delete state.zoom;
+  state.zoom = Math.max(1, Math.min(100, currentZoom));
+} catch (e) {
+  console.warn('zoom cleanup failed', e);
+}
+
+(function () {
+  const slider = document.getElementById('zoom');
+  const label = document.getElementById('zoomVal');
+  if (!slider) return;
+
+  let timer = null;
+
+  const clamp = (z) => Math.max(1, Math.min(100, Number(z) || 1));
+
+  const sync = () => {
+    state.zoom = clamp(state.zoom);
+    slider.value = Math.round(state.zoom);
+    if (label) label.textContent = slider.value;
+  };
+
+  slider.oninput = (e) => {
+    state.zoom = clamp(e.target.value);
+    sync();
+    clearTimeout(timer);
+    timer = setTimeout(render, 120);
+  };
+
+  sync();
+})();
+// Fix final: normalizar zoom, evitar cola del worker y asegurar Renderizar
+try {
+  const currentZoom = Number(state.zoom) || 1;
+  delete state.zoom;
+  state.zoom = Math.max(1, Math.min(100, currentZoom));
+} catch (e) {
+  console.warn('No se pudo normalizar state.zoom', e);
+}
+
+(function () {
+  const slider = document.getElementById('zoom');
+  const label = document.getElementById('zoomVal');
+  if (!slider) return;
+
+  let timer = null;
+  const clamp = (z) => Math.max(1, Math.min(100, Number(z) || 1));
+
+  const sync = () => {
+    state.zoom = clamp(state.zoom);
+    slider.value = Math.round(state.zoom);
+    if (label) label.textContent = slider.value;
+  };
+
+  slider.oninput = (e) => {
+    state.zoom = clamp(e.target.value);
+    sync();
+    clearTimeout(timer);
+    timer = setTimeout(render, 120);
+  };
+
+  sync();
+})();
+
+(function () {
+  let workerBusy = false;
+  let pendingRender = false;
+
+  const originalPostMessage = worker.postMessage.bind(worker);
+
+  worker.postMessage = function (message) {
+    workerBusy = true;
+    try {
+      return originalPostMessage(message);
+    } catch (e) {
+      workerBusy = false;
+      throw e;
+    }
+  };
+
+  const previousOnMessage = worker.onmessage;
+
+  worker.onmessage = function (event) {
+    try {
+      if (typeof previousOnMessage === 'function') {
+        previousOnMessage.call(this, event);
+      }
+    } finally {
+      workerBusy = false;
+
+      if (pendingRender) {
+        pendingRender = false;
+        render();
+      }
+    }
+  };
+
+  worker.onerror = function (event) {
+    workerBusy = false;
+    pendingRender = false;
+    console.error('Worker error:', event && event.message ? event.message : event);
+  };
+
+  const originalRender = render;
+
+  render = function () {
+    if (workerBusy) {
+      pendingRender = true;
+      return;
+    }
+
+    originalRender();
+  };
+
+  const btn = document.getElementById('renderBtn');
+
+  if (btn) {
+    btn.onclick = function () {
+      console.log('Renderizar pulsado:', state.type, 'zoom', state.zoom, 'iter', state.maxIter);
+      render();
+    };
+  }
+})();
