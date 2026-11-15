@@ -66,16 +66,50 @@ document.getElementById('maxIter').oninput = (e) => { state.maxIter = parseInt(e
 let zoomTimeout;
 document.getElementById('zoom').oninput = (e) => { state.zoom = parseFloat(e.target.value); document.getElementById('zoomVal').textContent = e.target.value; clearTimeout(zoomTimeout); zoomTimeout = setTimeout(render, 150); };
 document.getElementById('renderBtn').onclick = () => render();
-canvas.onclick = (e) => {
-  const rect = canvas.getBoundingClientRect();
-  const x = (e.clientX - rect.left) / rect.width;
-  const y = (e.clientY - rect.top) / rect.height;
+canvas.onmousedown = (e) => {
+  canvas.style.cursor = "grabbing";
+  const startX = e.clientX;
+  const startY = e.clientY;
+  const startCenterX = state.centerX;
+  const startCenterY = state.centerY;
   const range = 3.0 / state.zoom;
-  state.centerX += (x - 0.5) * range;
-  state.centerY += (y - 0.5) * (range / (canvas.width / canvas.height));
-  state.zoom *= 1.5;
-  document.getElementById('zoom').value = Math.min(1000, state.zoom);
-  document.getElementById('zoomVal').textContent = Math.min(1000, state.zoom);
+  const aspect = canvas.width / canvas.height;
+
+  const onMove = (ev) => {
+    const dx = ev.clientX - startX;
+    const dy = ev.clientY - startY;
+    state.centerX = startCenterX - (dx / canvas.width) * range;
+    state.centerY = startCenterY - (dy / canvas.height) * (range / aspect);
+    render();
+  };
+
+  const onUp = () => {
+    canvas.style.cursor = "grab";
+    document.removeEventListener("mousemove", onMove);
+    document.removeEventListener("mouseup", onUp);
+  };
+
+  document.addEventListener("mousemove", onMove);
+  document.addEventListener("mouseup", onUp);
+};
+
+canvas.onwheel = (e) => {
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left;
+  const mouseY = e.clientY - rect.top;
+  const range = 3.0 / state.zoom;
+  const aspect = canvas.width / canvas.height;
+  const worldX = state.centerX + (mouseX / canvas.width - 0.5) * range;
+  const worldY = state.centerY + (mouseY / canvas.height - 0.5) * (range / aspect);
+
+  const zoomFactor = e.deltaY < 0 ? 1.3 : 1 / 1.3;
+  state.zoom *= zoomFactor;
+
+  const newRange = 3.0 / state.zoom;
+  state.centerX = worldX - (mouseX / canvas.width - 0.5) * newRange;
+  state.centerY = worldY - (mouseY / canvas.height - 0.5) * (newRange / aspect);
+
   render();
 };
 
