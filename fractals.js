@@ -208,8 +208,8 @@ window.addEventListener('load', () => { resizeCanvas(); render(); });
     tricorn: { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 },
     celtic: { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 },
     buffalo: { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 },
-    multibrot3: { centerX: 0, centerY: 0, zoom: 1.5, maxIter: 350 },
-    multibrot4: { centerX: 0, centerY: 0, zoom: 1.5, maxIter: 350 },
+    multibrot3: { centerX: 0, centerY: 0, zoom: 2, maxIter: 350 },
+    multibrot4: { centerX: 0, centerY: 0, zoom: 2, maxIter: 350 },
     phoenix: { centerX: 0, centerY: 0, zoom: 1, maxIter: 500 }
   };
 
@@ -260,3 +260,6 @@ window.addEventListener('load', () => { resizeCanvas(); render(); });
   // Aplicar vista correcta desde la primera carga
   resetViewForType(state.type);
 })();
+
+// Fix: repaint after default view reset
+render();
