@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 const I18N = {
-  es: { title: "Motor de Fractales", type: "Tipo de Fractal", mandelbrot: "Mandelbrot", julia: "Julia", burning: "Burning Ship", tricorn: "Tricorn", celtic: "Celtic", buffalo: "Buffalo", multibrot3: "Multibrot z^3", multibrot4: "Multibrot z^4", phoenix: "Phoenix", multibrot5: "Multibrot z^5", multibrot6: "Multibrot z^6", iter: "Iteraciones", zoom: "Nivel de Zoom", palette: "Paleta", lang: "English", render: "Renderizar" },
-  en: { title: "Fractal Engine", type: "Fractal Type", mandelbrot: "Mandelbrot", julia: "Julia", burning: "Burning Ship", tricorn: "Tricorn", celtic: "Celtic", buffalo: "Buffalo", multibrot3: "Multibrot z^3", multibrot4: "Multibrot z^4", phoenix: "Phoenix", multibrot5: "Multibrot z^5", multibrot6: "Multibrot z^6", iter: "Iterations", zoom: "Zoom Level", palette: "Palette", lang: "Español", render: "Render" }
+  es: { title: "Motor de Fractales", type: "Tipo de Fractal", mandelbrot: "Mandelbrot", julia: "Julia", burning: "Burning Ship", tricorn: "Tricorn", celtic: "Celtic", buffalo: "Buffalo", multibrot3: "Multibrot z^3", multibrot4: "Multibrot z^4", phoenix: "Phoenix", multibrot5: "Multibrot z^5", multibrot6: "Multibrot z^6", iter: "Iteraciones", zoom: "Nivel de Zoom", palette: "Paleta", lang: "English", download: "Descargar PNG", render: "Renderizar" },
+  en: { title: "Fractal Engine", type: "Fractal Type", mandelbrot: "Mandelbrot", julia: "Julia", burning: "Burning Ship", tricorn: "Tricorn", celtic: "Celtic", buffalo: "Buffalo", multibrot3: "Multibrot z^3", multibrot4: "Multibrot z^4", phoenix: "Phoenix", multibrot5: "Multibrot z^5", multibrot6: "Multibrot z^6", iter: "Iterations", zoom: "Zoom Level", palette: "Palette", lang: "Español", download: "Download PNG", render: "Render" }
 };
 
 let currentLang = 'es';
@@ -192,10 +192,10 @@ window.addEventListener('load', () => { resizeCanvas(); render(); });
     tricorn: { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 },
     celtic: { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 },
     buffalo: { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 },
-    multibrot3: { centerX: 0, centerY: 0, zoom: 2, maxIter: 350 },
-    multibrot4: { centerX: 0, centerY: 0, zoom: 2, maxIter: 350 },
-    multibrot5: { centerX: 0, centerY: 0, zoom: 2, maxIter: 300 },
-    multibrot6: { centerX: 0, centerY: 0, zoom: 2, maxIter: 300 },
+    multibrot3: { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 },
+    multibrot4: { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 },
+    multibrot5: { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 },
+    multibrot6: { centerX: 0, centerY: 0, zoom: 1, maxIter: 300 },
     phoenix: { centerX: 0, centerY: 0, zoom: 1, maxIter: 350 }
   };
 
@@ -460,4 +460,180 @@ try {
     if (busy) { pending = true; return; }
     origRender();
   };
+})();
+// Final: download PNG, robust render, frame guard, zoom normalization
+(function () {
+  const clamp = (v, min, max, fallback) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? Math.max(min, Math.min(max, n)) : fallback;
+  };
+
+  try {
+    const z = clamp(state.zoom, 1, 100, 1);
+    delete state.zoom;
+    state.zoom = z;
+  } catch (e) {
+    console.warn('No se pudo normalizar zoom', e);
+  }
+
+  const zoomSlider = document.getElementById('zoom');
+  const zoomVal = document.getElementById('zoomVal');
+  let zoomTimer = null;
+
+  function syncZoomUI() {
+    state.zoom = clamp(state.zoom, 1, 100, 1);
+    if (zoomSlider) zoomSlider.value = Math.round(state.zoom);
+    if (zoomVal) zoomVal.textContent = Math.round(state.zoom);
+  }
+
+  if (zoomSlider) {
+    zoomSlider.oninput = function (e) {
+      state.zoom = clamp(e.target.value, 1, 100, 1);
+      syncZoomUI();
+      clearTimeout(zoomTimer);
+      zoomTimer = setTimeout(render, 120);
+    };
+  }
+
+  let workerBusy = false;
+  let pendingRender = false;
+  let latestRid = 0;
+
+  const nativePostMessage = Worker.prototype.postMessage.bind(worker);
+
+  worker.postMessage = function (message) {
+    message = message || {};
+    message.__rid = ++latestRid;
+    workerBusy = true;
+    try {
+      return nativePostMessage(message);
+    } catch (e) {
+      workerBusy = false;
+      throw e;
+    }
+  };
+
+  worker.onmessage = function (event) {
+    const d = event && event.data;
+    const isCurrent = !d || typeof d.__rid !== 'number' || d.__rid === latestRid;
+
+    if (!isCurrent) {
+      return;
+    }
+
+    try {
+      const expected = canvas.width * canvas.height * 4;
+
+      if (!d || !d.data || typeof d.data.byteLength !== 'number' || d.data.byteLength !== expected) {
+        console.warn('Frame descartado por dimensiones:', d && d.data ? d.data.byteLength : null, 'esperado:', expected);
+        return;
+      }
+
+      if (d.width && d.height && (d.width !== canvas.width || d.height !== canvas.height)) {
+        console.warn('Frame descartado por canvas:', d.width, d.height, 'actual:', canvas.width, canvas.height);
+        return;
+      }
+
+      const img = new ImageData(new Uint8ClampedArray(d.data), canvas.width, canvas.height);
+      ctx.putImageData(img, 0, 0);
+    } finally {
+      workerBusy = false;
+      if (pendingRender) {
+        pendingRender = false;
+        render();
+      }
+    }
+  };
+
+  worker.onerror = function (event) {
+    workerBusy = false;
+    pendingRender = false;
+    console.error('Worker error:', event && event.message ? event.message : event);
+  };
+
+  render = function () {
+    if (workerBusy) {
+      pendingRender = true;
+      return;
+    }
+
+    const w = canvas.width;
+    const h = canvas.height;
+    if (!w || !h) return;
+
+    syncZoomUI();
+
+    const aspect = w / h;
+    const range = 3.0 / clamp(state.zoom, 1, 100, 1);
+    const effectiveIter = Math.min(
+      2000,
+      Math.max(
+        Number(state.maxIter) || 300,
+        Math.floor(100 + 120 * Math.log2(Math.max(1, state.zoom)))
+      )
+    );
+
+    const juliaC = (state.type === 'julia' || state.type === 'phoenix')
+      ? {
+          r: clamp(state.juliaRe, -10, 10, -0.8),
+          i: clamp(state.juliaIm, -10, 10, 0.156)
+        }
+      : null;
+
+    const phoenixP = state.type === 'phoenix'
+      ? clamp(state.phoenixP, -2, 2, 0.5)
+      : 0.5;
+
+    worker.postMessage({
+      width: w,
+      height: h,
+      minX: state.centerX - range / 2,
+      maxX: state.centerX + range / 2,
+      minY: state.centerY - (range / aspect) / 2,
+      maxY: state.centerY + (range / aspect) / 2,
+      maxIter: effectiveIter,
+      type: state.type,
+      palette: state.palette,
+      juliaC: juliaC,
+      phoenixP: phoenixP
+    });
+  };
+
+  const renderBtn = document.getElementById('renderBtn');
+  if (renderBtn) {
+    renderBtn.onclick = function () {
+      console.log('Renderizar pulsado:', state.type, 'zoom', state.zoom, 'iter', state.maxIter);
+      render();
+    };
+  }
+
+  const downloadBtn = document.getElementById('downloadBtn');
+  if (downloadBtn) {
+    downloadBtn.onclick = function () {
+      try {
+        const url = canvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        const safeType = String(state.type).replace(/[^a-z0-9_-]/gi, '');
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+
+        a.href = url;
+        a.download = 'fractal-' + safeType + '-z' + Math.round(state.zoom) + '-' + stamp + '.png';
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch (e) {
+        console.error('No se pudo descargar PNG:', e);
+        alert('No se pudo descargar la imagen. Revisa la consola.');
+      }
+    };
+  }
+
+  syncZoomUI();
+
+  if (typeof resizeCanvas === 'function') {
+    resizeCanvas();
+  }
+
+  render();
 })();
